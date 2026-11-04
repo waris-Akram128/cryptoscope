@@ -1,0 +1,17 @@
+# Virtual environment
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Generated data (the pipeline recreates it)
+data/
+logs/
+outputs/
+*.db
+
+# Secrets and editor files
+.env
+.vscode/
+.ipynb_checkpoints/
