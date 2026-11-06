@@ -50,10 +50,11 @@ class CandleValidator:
             return None, None, None
 
     def run(self, tables):
-        """Validate every coin. Return (clean_tables, rejected_tables)."""
+        """Validate every coin. Return (clean_tables, rejected_tables, reports)."""
         print("STAGE 3: VALIDATE")
         clean_tables = {}
         rejected_tables = {}
+        reports = {}
 
         try:
             for symbol, df in tables.items():
@@ -63,6 +64,7 @@ class CandleValidator:
 
                 clean_tables[symbol] = clean
                 rejected_tables[symbol] = rejected
+                reports[symbol] = report
                 print(f"  {symbol}: clean={report['rows_clean']}, "
                       f"duplicates={report['duplicates_removed']}, "
                       f"rejected={report['rows_rejected']}, "
@@ -71,4 +73,4 @@ class CandleValidator:
         except Exception as e:
             print("Validate stage failed:", e)
 
-        return clean_tables, rejected_tables
+        return clean_tables, rejected_tables, reports
