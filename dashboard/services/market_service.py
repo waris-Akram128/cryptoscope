@@ -11,7 +11,7 @@ from cryptoscope.config import CryptoScopeConfig
 class MarketService:
 
     def __init__(self):
-        self.url = "https://api.binance.com/api/v3/ticker/24hr"
+        self.url = "https://data-api.binance.vision/api/v3/ticker/24hr"
 
         self.symbols = CryptoScopeConfig.SYMBOLS
 
