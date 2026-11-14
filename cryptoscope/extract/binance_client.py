@@ -78,3 +78,91 @@ class BinanceClient:
         except KeyError:
             print("Error: unsupported interval:", interval)
             return []  
+    
+    def get_new_klines(self, symbol, last_time, interval="1h"):
+        """
+        Fetch only new CLOSED candles after last_time.
+
+        last_time: timezone-aware datetime in UTC
+        Returns: list of Binance candles
+        """
+
+        from datetime import datetime, timezone
+
+        if interval not in INTERVAL_MS:
+            raise ValueError(
+                f"Unsupported interval: {interval}"
+            )
+
+        if last_time.tzinfo is None:
+            raise ValueError(
+                "last_time must be timezone-aware"
+            )
+
+        step = INTERVAL_MS[interval]
+
+        # 1. Convert latest stored candle to milliseconds
+        last_ms = int(last_time.timestamp() * 1000)
+
+        # 2. Start after the last stored candle
+        next_start = last_ms + step
+
+        # 3. Find the last completed candle
+        now_ms = int(
+            datetime.now(timezone.utc).timestamp() * 1000
+        )
+
+        last_closed = (now_ms // step) * step - step
+
+        # 4. No new candles available
+        if next_start > last_closed:
+            print(f"  {symbol}: already up to date")
+            return []
+
+        all_candles = []
+
+        # 5. Download in batches of up to 1000
+        while next_start <= last_closed:
+
+            batch = self.get_klines(
+                symbol=symbol,
+                interval=interval,
+                limit=1000,
+                start_time=next_start,
+                end_time=last_closed + step - 1
+            )
+
+            if batch is None:
+                raise RuntimeError(
+                    f"Binance request failed for {symbol}"
+                )
+
+            if not batch:
+                break
+
+            # Keep only requested completed candles
+            batch = [
+                candle for candle in batch
+                if next_start <= candle[0] <= last_closed
+            ]
+
+            if not batch:
+                break
+
+            all_candles.extend(batch)
+
+            new_start = batch[-1][0] + step
+
+            if new_start <= next_start:
+                raise RuntimeError(
+                    f"Pagination did not advance for {symbol}"
+                )
+
+            next_start = new_start
+
+        print(
+            f"  {symbol}: downloaded "
+            f"{len(all_candles)} new candles"
+        )
+
+        return all_candles

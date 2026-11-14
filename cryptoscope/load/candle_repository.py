@@ -80,3 +80,53 @@ class CandleRepository:
 
         finally:
             conn.close()
+    
+    def get_latest_candle_time(self, symbol):
+        """
+        Return the latest stored candle's opening time
+        as a UTC datetime.
+
+        Return None if no candles exist.
+        Raise RuntimeError if the database query fails.
+        """
+
+        from datetime import datetime, timezone
+
+        conn = self.db.get_connection()
+
+        if conn is None:
+            raise RuntimeError(
+                "Could not connect to the database"
+            )
+
+        try:
+            row = conn.execute(
+                """
+                SELECT MAX(c.open_time)
+                FROM fact_candles_1h AS c
+                JOIN dim_asset AS a
+                    ON c.asset_id = a.asset_id
+                WHERE a.symbol = ?
+                """,
+                (symbol,)
+            ).fetchone()
+
+            if row is None or row[0] is None:
+                return None
+
+            latest_time = datetime.strptime(
+                row[0],
+                "%Y-%m-%d %H:%M:%S"
+            )
+
+            return latest_time.replace(
+                tzinfo=timezone.utc
+            )
+
+        except Exception as e:
+            raise RuntimeError(
+                f"Could not fetch latest candle for {symbol}"
+            ) from e
+
+        finally:
+            conn.close()
