@@ -10,8 +10,8 @@ them in SQLite for analysis.
 - [x] Extract: Binance client, pagination, raw JSON cache
 - [x] Transform: raw candles to typed Pandas DataFrame
 - [x] Validate: Pydantic row checks, duplicate and missing-hour detection
-- [ ] Load: SQLite database
-- [ ] Analysis and charts
+- [x] Load: SQLite database
+- [x] Analysis and charts
 
 ## Setup
 
