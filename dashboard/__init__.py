@@ -1,0 +1,1 @@
+"""CryptoScope web dashboard package."""

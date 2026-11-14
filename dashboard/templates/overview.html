@@ -1,0 +1,146 @@
+
+{% extends "base.html" %}
+
+{% block title %}Overview · CryptoScope{% endblock %}
+
+{% block content %}
+
+<section class="heading-row">
+    <div>
+        <div class="eyebrow">LIVE MARKET MONITOR</div>
+        <h1>Market Overview</h1>
+        <p class="muted">
+            Track cryptocurrency prices and market activity.
+        </p>
+    </div>
+
+    <span class="pill" id="market-status">
+        Connecting...
+    </span>
+</section>
+
+<div class="notice">
+    Binance spot market data.
+    Prices and 24-hour statistics refresh every 60 seconds.
+    <span id="last-update">Waiting for data...</span>
+</div>
+
+<section class="stat-grid">
+
+    <article class="card stat">
+        <span>Tracked Assets</span>
+        <strong id="tracked-assets">--</strong>
+        <small>BTC · ETH · SOL · BNB · XRP</small>
+    </article>
+
+    <article class="card stat">
+        <span>Top 24h Gainer</span>
+        <strong id="top-gainer">--</strong>
+        <small>Highest percentage change</small>
+    </article>
+
+    <article class="card stat">
+        <span>Combined 24h Quote Volume</span>
+        <strong id="total-volume">--</strong>
+        <small>USDT volume across tracked pairs</small>
+    </article>
+
+    <article class="card stat">
+        <span>Data Status</span>
+        <strong id="feed-status">Connecting</strong>
+        <small>Binance Spot API</small>
+    </article>
+
+</section>
+
+<div class="dashboard-grid">
+
+    <section class="card chart-card">
+        <div class="section-top">
+            <div>
+                <h2>24h Price Changes</h2>
+                <p>Percentage change by cryptocurrency</p>
+            </div>
+            <span class="subtle-chip">Binance</span>
+        </div>
+
+        <div id="change-chart"
+             style="width:100%; min-height:300px;">
+            Loading chart...
+        </div>
+    </section>
+
+    <section class="card insights-card">
+        <div class="section-top">
+            <div>
+                <h2>Market Insights</h2>
+                <p>Snapshot of tracked markets</p>
+            </div>
+        </div>
+
+        <div class="feature">
+            <span class="feature-icon">↗</span>
+            <div>
+                <strong>Top Gainer</strong>
+                <small id="insight-gainer">Loading...</small>
+            </div>
+        </div>
+
+        <div class="feature">
+            <span class="feature-icon">↘</span>
+            <div>
+                <strong>Lowest Performer</strong>
+                <small id="insight-loser">Loading...</small>
+            </div>
+        </div>
+
+        <div class="feature">
+            <span class="feature-icon">◉</span>
+            <div>
+                <strong>Highest Trading Activity</strong>
+                <small id="insight-volume">Loading...</small>
+            </div>
+        </div>
+    </section>
+
+</div>
+
+<section class="card market-card">
+
+    <div class="section-top">
+        <div>
+            <h2>Live Market Watchlist</h2>
+            <p>Prices and rolling 24-hour market statistics</p>
+        </div>
+        <span class="subtle-chip" id="refresh-timer">
+    Next refresh in 60s
+</span>
+    </div>
+
+    <div class="table-wrap">
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Asset</th>
+                    <th>Price (USDT)</th>
+                    <th>24h Change</th>
+                    <th>24h High</th>
+                    <th>24h Low</th>
+                    <th>24h Volume (USDT)</th>
+                </tr>
+            </thead>
+
+            <tbody id="market-table">
+                <tr>
+                    <td colspan="6">
+                        Loading Binance market data...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+</section>
+
+{% endblock %}

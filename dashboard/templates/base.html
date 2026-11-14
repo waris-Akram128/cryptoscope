@@ -1,0 +1,117 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {% block title %}CryptoScope{% endblock %}
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<div class="app-shell">
+
+    <aside class="sidebar">
+
+        <a class="brand" href="{{ url_for('overview') }}">
+            <span class="brand-symbol">◈</span>
+            <span>
+                Crypto<span class="brand-accent">Scope</span>
+                <small>MARKET INTELLIGENCE</small>
+            </span>
+        </a>
+
+        <div class="nav-label">WORKSPACE</div>
+
+        <nav class="nav">
+
+            <a class="nav-link {% if active_page == 'overview' %}active{% endif %}"
+               href="{{ url_for('overview') }}">
+                <span>▦</span> Overview
+            </a>
+
+            <a class="nav-link {% if active_page == 'explorer' %}active{% endif %}"
+               href="{{ url_for('explorer') }}">
+                <span>⌁</span> Coin Explorer
+            </a>
+
+            <a class="nav-link {% if active_page == 'compare' %}active{% endif %}"
+               href="{{ url_for('compare') }}">
+                <span>⇄</span> Compare Assets
+            </a>
+
+            <a class="nav-link {% if active_page == 'analytics' %}active{% endif %}"
+               href="{{ url_for('analytics') }}">
+                <span>◫</span> Analytics
+            </a>
+
+            <a class="nav-link {% if active_page == 'data' %}active{% endif %}"
+               href="{{ url_for('data_explorer') }}">
+                <span>▤</span> Data Explorer
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+            <span class="status-dot"></span>
+            <div>
+                <strong>CryptoScope</strong>
+                <small>Market Monitoring Dashboard</small>
+            </div>
+        </div>
+
+    </aside>
+
+    <div class="main-area">
+
+        <header class="topbar">
+            <div class="breadcrumb">
+                CryptoScope
+                <span>/</span>
+                {{ 'Overview' if active_page == 'overview' else title }}
+            </div>
+
+            <span class="demo-tag">
+                BINANCE MARKET DATA
+            </span>
+        </header>
+
+        <main class="content">
+            {% block content %}{% endblock %}
+        </main>
+
+        <footer class="footer">
+            CryptoScope · Market analytics for education and research
+        </footer>
+
+    </div>
+
+</div>
+
+{% if active_page == 'overview' %}
+
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
+<script src="{{ url_for('static', filename='js/markets.js') }}">
+</script>
+
+{% endif %}
+
+{% if active_page in ['overview', 'explorer', 'compare'] %}
+
+<script src="{{ url_for('static', filename='js/year_history.js') }}">
+</script>
+
+{% endif %}
+
+</body>
+</html>

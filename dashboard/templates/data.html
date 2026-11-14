@@ -1,0 +1,366 @@
+
+{% extends "base.html" %}
+
+{% block title %}Data Explorer · CryptoScope{% endblock %}
+
+{% block content %}
+
+<style>
+.data-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 25px;
+}
+
+.data-header h1 {
+    margin: 8px 0;
+}
+
+.data-controls {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    align-items: end;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.data-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+    min-width: 135px;
+}
+
+.data-field label {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.data-field select,
+.data-field input {
+    padding: 11px 13px;
+    color: #f8fafc;
+    background: #101b2e;
+    border: 1px solid #334155;
+    border-radius: 9px;
+    font: inherit;
+    width: 100%;
+    color-scheme: dark;
+}
+
+.data-button {
+    background: #0ea5e9;
+    border: none;
+    border-radius: 9px;
+    padding: 12px 18px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.data-button:hover {
+    background: #0284c7;
+}
+
+.data-button.secondary {
+    background: #26364e;
+}
+
+.data-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.data-metrics {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.data-metric {
+    padding: 20px;
+    min-width: 0;
+}
+
+.data-metric span {
+    display: block;
+    color: #94a3b8;
+    font-size: 12px;
+    margin-bottom: 9px;
+}
+
+.data-metric strong {
+    display: block;
+    font-size: 20px;
+    color: #f8fafc;
+    overflow-wrap: anywhere;
+}
+
+.data-panel {
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.data-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 15px;
+}
+
+.data-panel-header h2 {
+    margin: 0 0 5px;
+}
+
+.data-panel-header p {
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+.data-table-wrap {
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    white-space: nowrap;
+}
+
+.data-table th {
+    padding: 13px;
+    font-size: 12px;
+    color: #94a3b8;
+    text-align: left;
+    background: #101b2e;
+}
+
+.data-table td {
+    padding: 13px;
+    font-size: 13px;
+    color: #e2e8f0;
+    border-bottom: 1px solid #26364e;
+}
+
+.data-table tr:hover td {
+    background: rgba(56, 189, 248, 0.04);
+}
+
+.data-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.data-pagination-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.data-error {
+    display: none;
+    color: #fda4af;
+    border: 1px solid #be123c;
+    border-radius: 9px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.data-footer {
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+#data-status {
+    color: #38bdf8;
+    font-size: 13px;
+}
+
+@media(max-width: 950px) {
+    .data-metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media(max-width: 550px) {
+    .data-metrics {
+        grid-template-columns: 1fr;
+    }
+
+    .data-field {
+        min-width: 100%;
+    }
+}
+</style>
+
+<section class="data-header">
+    <div>
+        <div class="eyebrow">HISTORICAL DATA EXPLORER</div>
+        <h1>Data Explorer</h1>
+        <p class="muted">
+            Search, filter and export stored cryptocurrency candles.
+        </p>
+    </div>
+
+    <span class="pill" id="data-status">
+        Loading...
+    </span>
+</section>
+
+<section class="card data-controls">
+
+    <div class="data-field">
+        <label for="data-symbol">Cryptocurrency</label>
+
+        <select id="data-symbol">
+            <option value="">All Assets</option>
+            <option value="BTCUSDT">Bitcoin (BTC)</option>
+            <option value="ETHUSDT">Ethereum (ETH)</option>
+            <option value="SOLUSDT">Solana (SOL)</option>
+            <option value="BNBUSDT">BNB</option>
+            <option value="XRPUSDT">XRP</option>
+        </select>
+    </div>
+
+    <div class="data-field">
+        <label for="data-start">Start Date (UTC)</label>
+        <input type="date" id="data-start">
+    </div>
+
+    <div class="data-field">
+        <label for="data-end">End Date (UTC)</label>
+        <input type="date" id="data-end">
+    </div>
+
+    <div class="data-field">
+        <label for="data-page-size">Rows Per Page</label>
+        <select id="data-page-size">
+            <option value="25">25 Rows</option>
+            <option value="50">50 Rows</option>
+            <option value="100">100 Rows</option>
+        </select>
+    </div>
+
+    <button class="data-button" id="apply-filters">
+        Apply Filters
+    </button>
+
+    <button class="data-button secondary" id="reset-filters">
+        Reset
+    </button>
+
+</section>
+
+<div id="data-error" class="data-error"></div>
+
+<section class="data-metrics">
+
+    <article class="card data-metric">
+        <span>Matching Candles</span>
+        <strong id="data-total">--</strong>
+    </article>
+
+    <article class="card data-metric">
+        <span>Cryptocurrencies</span>
+        <strong id="data-assets">--</strong>
+    </article>
+
+    <article class="card data-metric">
+        <span>Earliest Candle (UTC)</span>
+        <strong id="data-earliest">--</strong>
+    </article>
+
+    <article class="card data-metric">
+        <span>Latest Candle (UTC)</span>
+        <strong id="data-latest">--</strong>
+    </article>
+
+</section>
+
+<section class="card data-panel">
+
+    <div class="data-panel-header">
+        <div>
+            <h2>Historical Candle Records</h2>
+            <p>
+                Hourly OHLCV data stored in CryptoScope SQLite.
+            </p>
+        </div>
+
+        <button class="data-button" id="export-csv">
+            ↓ Export CSV
+        </button>
+    </div>
+
+    <div class="data-table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Symbol</th>
+                    <th>Open Time (UTC)</th>
+                    <th>Open</th>
+                    <th>High</th>
+                    <th>Low</th>
+                    <th>Close</th>
+                    <th>Volume</th>
+                    <th>Quote Volume</th>
+                    <th>Trades</th>
+                </tr>
+            </thead>
+
+            <tbody id="data-table-body">
+                <tr>
+                    <td colspan="9">
+                        Loading historical records...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="data-pagination">
+        <span id="pagination-info">
+            Loading...
+        </span>
+
+        <div class="data-pagination-buttons">
+            <button
+                class="data-button secondary"
+                id="previous-page"
+                disabled
+            >
+                Previous
+            </button>
+
+            <button
+                class="data-button secondary"
+                id="next-page"
+                disabled
+            >
+                Next
+            </button>
+        </div>
+    </div>
+
+</section>
+
+<p class="data-footer">
+    Source: CryptoScope SQLite · All timestamps UTC ·
+    Export limit: 20,000 records.
+    Historical records are read-only in this interface.
+</p>
+
+<script src="{{ url_for('static', filename='js/data.js') }}"></script>
+
+{% endblock %}

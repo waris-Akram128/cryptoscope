@@ -1,0 +1,302 @@
+
+{% extends "base.html" %}
+
+{% block title %}Advanced Analytics · CryptoScope{% endblock %}
+
+{% block content %}
+
+<style>
+.analytics-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.analytics-header h1 {
+    margin: 8px 0;
+}
+
+.analytics-controls {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.analytics-controls label {
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+.analytics-controls select {
+    background: #101b2e;
+    color: #f8fafc;
+    border: 1px solid #334155;
+    border-radius: 9px;
+    padding: 11px 15px;
+    font: inherit;
+}
+
+.analytics-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.analytics-metric {
+    padding: 20px;
+}
+
+.analytics-metric span {
+    display: block;
+    color: #94a3b8;
+    font-size: 12px;
+    margin-bottom: 10px;
+}
+
+.analytics-metric strong {
+    display: block;
+    color: #f8fafc;
+    font-size: 22px;
+    overflow-wrap: anywhere;
+}
+
+.analytics-panel {
+    padding: 22px;
+    margin-bottom: 20px;
+}
+
+.analytics-panel h2 {
+    margin: 0 0 8px;
+}
+
+.analytics-panel p {
+    color: #94a3b8;
+    font-size: 13px;
+    margin-bottom: 16px;
+}
+
+.analytics-chart {
+    width: 100%;
+    min-height: 350px;
+}
+
+.analytics-error {
+    display: none;
+    color: #fda4af;
+    border: 1px solid #be123c;
+    border-radius: 9px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.analytics-footer {
+    color: #94a3b8;
+    font-size: 12px;
+    margin: 20px 0;
+}
+
+#analytics-timer,
+#risk-status {
+    color: #38bdf8;
+    font-size: 12px;
+}
+
+.risk-section-heading {
+    margin: 35px 0 18px;
+}
+
+.risk-section-heading h2 {
+    margin-bottom: 6px;
+}
+
+.risk-section-heading p {
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+@media (max-width: 800px) {
+    .analytics-metrics {
+        grid-template-columns: 1fr;
+    }
+
+    .analytics-panel {
+        padding: 14px;
+    }
+}
+</style>
+
+<section class="analytics-header">
+    <div>
+        <div class="eyebrow">HISTORICAL MARKET INTELLIGENCE</div>
+        <h1>Advanced Analytics</h1>
+        <p class="muted">
+            Explore market relationships, volatility and unusual activity.
+        </p>
+    </div>
+
+    <div>
+        <span class="pill" id="analytics-status">Connecting...</span>
+        <span id="analytics-timer">Refresh in 60s</span>
+    </div>
+</section>
+
+<!-- CORRELATION SECTION -->
+
+<section class="card analytics-controls">
+    <label for="correlation-days">Correlation Period</label>
+
+    <select id="correlation-days">
+        <option value="30">Last 30 Days</option>
+        <option value="90">Last 90 Days</option>
+        <option value="365" selected>Last 1 Year</option>
+    </select>
+
+    <span class="muted" id="analytics-period">
+        Loading...
+    </span>
+</section>
+
+<div id="analytics-error" class="analytics-error"></div>
+
+<section class="analytics-metrics">
+
+    <article class="card analytics-metric">
+        <span>Strongest Positive Correlation</span>
+        <strong id="strongest-pair">--</strong>
+        <small id="strongest-value">--</small>
+    </article>
+
+    <article class="card analytics-metric">
+        <span>Weakest Correlation</span>
+        <strong id="weakest-pair">--</strong>
+        <small id="weakest-value">--</small>
+    </article>
+
+    <article class="card analytics-metric">
+        <span>Daily Returns Analyzed</span>
+        <strong id="analyzed-days">--</strong>
+        <small>Matched dates</small>
+    </article>
+
+</section>
+
+<section class="card analytics-panel">
+    <h2>Cryptocurrency Correlation Heatmap</h2>
+    <p>Pearson correlation of daily percentage returns.</p>
+
+    <div id="correlation-chart" class="analytics-chart">
+        Loading correlation...
+    </div>
+</section>
+
+<section class="card analytics-panel">
+    <h2>Daily Return Volatility Comparison</h2>
+    <p>Compare daily return fluctuations across five cryptocurrencies.</p>
+
+    <div id="analytics-volatility" class="analytics-chart">
+        Loading volatility...
+    </div>
+</section>
+
+<!-- RISK EXPLORER SECTION -->
+
+<section class="risk-section-heading">
+    <h2>Market Risk Explorer</h2>
+    <p>
+        Analyze daily returns, changing volatility and unusual price movements.
+    </p>
+</section>
+
+<section class="card analytics-controls">
+
+    <label for="risk-coin">Cryptocurrency</label>
+
+    <select id="risk-coin">
+        <option value="BTCUSDT">Bitcoin</option>
+        <option value="ETHUSDT">Ethereum</option>
+        <option value="SOLUSDT">Solana</option>
+        <option value="BNBUSDT">BNB</option>
+        <option value="XRPUSDT">XRP</option>
+    </select>
+
+    <label for="risk-days">Analysis Period</label>
+
+    <select id="risk-days">
+        <option value="30">30 Days</option>
+        <option value="90">90 Days</option>
+        <option value="365" selected>1 Year</option>
+    </select>
+
+    <span id="risk-status">Loading...</span>
+</section>
+
+<div id="risk-error" class="analytics-error"></div>
+
+<section class="analytics-metrics">
+
+    <article class="card analytics-metric">
+        <span>Average Daily Return</span>
+        <strong id="risk-average">--</strong>
+    </article>
+
+    <article class="card analytics-metric">
+        <span>Daily Return Volatility</span>
+        <strong id="risk-volatility">--</strong>
+    </article>
+
+    <article class="card analytics-metric">
+        <span>Unusual Daily Movements</span>
+        <strong id="risk-anomalies">--</strong>
+    </article>
+
+</section>
+
+<section class="card analytics-panel">
+    <h2>Daily Return Distribution</h2>
+    <p>Frequency of positive and negative daily percentage returns.</p>
+
+    <div id="return-distribution" class="analytics-chart">
+        Loading distribution...
+    </div>
+</section>
+
+<section class="card analytics-panel">
+    <h2>30-Day Rolling Volatility</h2>
+    <p>How the standard deviation of daily returns changes over time.</p>
+
+    <div id="rolling-volatility" class="analytics-chart">
+        Loading rolling volatility...
+    </div>
+</section>
+
+<section class="card analytics-panel">
+    <h2>Unusual Price Movements</h2>
+    <p>
+        Highlight daily returns more than 2.5 standard deviations
+        from their historical average.
+    </p>
+
+    <div id="anomaly-chart" class="analytics-chart">
+        Loading anomalies...
+    </div>
+</section>
+
+<p class="analytics-footer">
+    Source: CryptoScope SQLite · Completed Binance Spot candles ·
+    Historical statistical patterns are not price predictions.
+    <span id="analytics-updated"></span>
+</p>
+
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
+<script src="{{ url_for('static', filename='js/analytics.js') }}"></script>
+<script src="{{ url_for('static', filename='js/risk.js') }}"></script>
+
+{% endblock %}

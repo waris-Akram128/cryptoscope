@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} · CryptoScope{% endblock %}
+{% block content %}
+    <div class="eyebrow">DASHBOARD FOUNDATION</div>
+    <h1>{{ title }}</h1>
+    <p class="muted">{{ description }}</p>
+    <section class="card empty-state">
+        <div class="empty-icon">◇</div>
+        <h2>Coming in a later milestone</h2>
+        <p>This page is routed correctly. We'll add actual controls, charts, and data once the foundation is verified.</p>
+        <a class="back-link" href="{{ url_for('overview') }}">← Back to overview</a>
+    </section>
+{% endblock %}

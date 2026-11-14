@@ -1,0 +1,312 @@
+
+{% extends "base.html" %}
+
+{% block title %}Compare Assets · CryptoScope{% endblock %}
+
+{% block content %}
+
+<style>
+.compare-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 22px;
+}
+
+.compare-heading h1 {
+    margin: 8px 0;
+}
+
+.compare-controls {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 20px;
+    margin-bottom: 20px;
+    align-items: end;
+}
+
+.compare-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+    min-width: 130px;
+}
+
+.compare-field label {
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+.compare-field select {
+    background: #101b2e;
+    color: #f8fafc;
+    border: 1px solid #334155;
+    border-radius: 9px;
+    padding: 12px;
+    font: inherit;
+    width: 100%;
+    cursor: pointer;
+}
+
+.compare-metrics {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.compare-metric {
+    padding: 20px;
+    min-width: 0;
+}
+
+.compare-metric span {
+    display: block;
+    color: #94a3b8;
+    font-size: 12px;
+    margin-bottom: 10px;
+}
+
+.compare-metric strong {
+    font-size: 22px;
+    color: #f8fafc;
+    overflow-wrap: anywhere;
+}
+
+.compare-panel {
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.compare-panel h2 {
+    margin: 0 0 6px;
+}
+
+.compare-panel p {
+    color: #94a3b8;
+    font-size: 13px;
+    margin-bottom: 15px;
+}
+
+.compare-chart {
+    width: 100%;
+    min-height: 330px;
+}
+
+.compare-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.compare-table th,
+.compare-table td {
+    padding: 14px;
+    text-align: left;
+    border-bottom: 1px solid #26364e;
+    white-space: nowrap;
+}
+
+.compare-table th {
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+.compare-table td {
+    color: #e2e8f0;
+    font-size: 14px;
+}
+
+.compare-table-wrap {
+    overflow-x: auto;
+}
+
+.compare-error {
+    display: none;
+    padding: 15px;
+    color: #fda4af;
+    border: 1px solid #be123c;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.compare-footer {
+    color: #94a3b8;
+    font-size: 12px;
+    margin: 20px 0;
+}
+
+.compare-status {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+#compare-timer {
+    color: #38bdf8;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+@media (max-width: 1000px) {
+    .compare-metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 560px) {
+    .compare-metrics {
+        grid-template-columns: 1fr;
+    }
+
+    .compare-panel {
+        padding: 12px;
+    }
+}
+</style>
+
+<section class="compare-heading">
+    <div>
+        <div class="eyebrow">MARKET COMPARISON</div>
+        <h1>Compare Assets</h1>
+        <p class="muted">
+            Compare cryptocurrency performance and market risk.
+        </p>
+    </div>
+
+    <div class="compare-status">
+        <span class="pill" id="compare-status">
+            Connecting...
+        </span>
+
+        <span id="compare-timer">
+            Refresh in 60s
+        </span>
+    </div>
+</section>
+
+<section class="card compare-controls">
+
+    <div class="compare-field">
+        <label for="asset-one">First Asset</label>
+        <select id="asset-one">
+            <option value="BTCUSDT">Bitcoin (BTC)</option>
+            <option value="ETHUSDT">Ethereum (ETH)</option>
+            <option value="SOLUSDT">Solana (SOL)</option>
+            <option value="BNBUSDT">BNB</option>
+            <option value="XRPUSDT">XRP</option>
+        </select>
+    </div>
+
+    <div class="compare-field">
+        <label for="asset-two">Second Asset</label>
+        <select id="asset-two">
+            <option value="BTCUSDT">Bitcoin (BTC)</option>
+            <option value="ETHUSDT" selected>Ethereum (ETH)</option>
+            <option value="SOLUSDT">Solana (SOL)</option>
+            <option value="BNBUSDT">BNB</option>
+            <option value="XRPUSDT">XRP</option>
+        </select>
+    </div>
+
+    <div class="compare-field">
+        <label for="compare-interval">Interval</label>
+        <select id="compare-interval">
+            <option value="1h">1 Hour</option>
+            <option value="4h">4 Hours</option>
+            <option value="1d">1 Day</option>
+        </select>
+    </div>
+
+    <div class="compare-field">
+        <label for="compare-limit">History</label>
+        <select id="compare-limit">
+            <option value="48">48 Candles</option>
+            <option value="168" selected>168 Candles</option>
+            <option value="336">336 Candles</option>
+            <option value="500">500 Candles</option>
+        </select>
+    </div>
+</section>
+
+<div class="compare-error" id="compare-error"></div>
+
+<section class="compare-metrics">
+    <article class="card compare-metric">
+        <span>Best Performer</span>
+        <strong id="best-performer">--</strong>
+    </article>
+
+    <article class="card compare-metric">
+        <span>Return Difference</span>
+        <strong id="return-difference">--</strong>
+    </article>
+
+    <article class="card compare-metric">
+        <span>Return Correlation</span>
+        <strong id="return-correlation">--</strong>
+    </article>
+
+    <article class="card compare-metric">
+        <span>Higher Volatility</span>
+        <strong id="higher-volatility">--</strong>
+    </article>
+</section>
+
+<section class="card compare-panel">
+    <h2>Normalized Price Performance</h2>
+    <p>
+        Both assets start at 100 to compare percentage performance.
+    </p>
+    <div id="performance-chart" class="compare-chart">
+        Loading chart...
+    </div>
+</section>
+
+<section class="card compare-panel">
+    <h2>Return Volatility</h2>
+    <p>
+        Standard deviation of returns for the selected candle interval.
+    </p>
+    <div id="volatility-chart" class="compare-chart">
+        Loading chart...
+    </div>
+</section>
+
+<section class="card compare-panel">
+    <h2>Performance Statistics</h2>
+    <p>Historical statistics for the same aligned time period.</p>
+
+    <div class="compare-table-wrap">
+        <table class="compare-table">
+            <thead>
+                <tr>
+                    <th>Metric</th>
+                    <th id="asset-one-heading">BTC</th>
+                    <th id="asset-two-heading">ETH</th>
+                </tr>
+            </thead>
+            <tbody id="comparison-table">
+                <tr>
+                    <td colspan="3">Loading statistics...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<p class="compare-footer">
+    Source: Binance Spot API · Completed candles only ·
+    UTC timestamps · Correlation measures historical return
+    relationships, not future price movements.
+    <span id="compare-updated"></span>
+</p>
+
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<script src="{{ url_for('static', filename='js/compare.js') }}"></script>
+
+{% endblock %}
